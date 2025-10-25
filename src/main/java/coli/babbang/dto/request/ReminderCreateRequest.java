@@ -7,7 +7,8 @@ public record ReminderCreateRequest(
         long approveCount,
         long reviewDay,
         long reviewHour,
-        List<String> reviewers
+        List<String> reviewers,
+        long channelId
 ) {
 
     public long reviewToHour() {

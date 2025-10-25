@@ -8,6 +8,8 @@ public enum ErrorCode {
 
     GITHUB_REPOSITORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "레포지토리를 찾을 수 없습니다"),
     PULL_REQUEST_NOT_FOUND(HttpStatus.BAD_REQUEST, "풀리퀘스트를 찾을 수 없습니다"),
+    REMINDER_NOT_FOUND(HttpStatus.BAD_REQUEST, "리마인더를 찾을 수 없습니다"),
+    DISCORD_PROPERTY_NOT_FOUND(HttpStatus.BAD_REQUEST, "디스코드 속성을 찾을 수 없습니다"),
 
     FIELD_ERROR(HttpStatus.BAD_REQUEST, "입력이 잘못되었습니다."),
     URL_PARAMETER_ERROR(HttpStatus.BAD_REQUEST, "입력이 잘못되었습니다."),
@@ -20,6 +22,7 @@ public enum ErrorCode {
     FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다."),
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다. 관리자에게 문의하세요."),
+    DISCORD_PROPERTIES_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, "디스코드 속성 값이 없습니다")
     ;
 
     private final HttpStatus status;

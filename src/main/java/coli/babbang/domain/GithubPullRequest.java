@@ -44,4 +44,8 @@ public class GithubPullRequest {
     public void merge() {
         this.status = ReviewStatus.DONE;
     }
+
+    public boolean isMerged() {
+        return this.status == ReviewStatus.DONE;
+    }
 }
