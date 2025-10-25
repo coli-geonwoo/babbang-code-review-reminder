@@ -21,7 +21,4 @@ public class RemindController {
         reminderService.create(request);
         return ResponseEntity.ok().build();
     }
-
-
-
 }

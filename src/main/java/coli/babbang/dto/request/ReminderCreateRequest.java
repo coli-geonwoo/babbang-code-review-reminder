@@ -10,4 +10,7 @@ public record ReminderCreateRequest(
         List<String> reviewers
 ) {
 
+    public long reviewToHour() {
+        return 24 * reviewDay + reviewHour;
+    }
 }

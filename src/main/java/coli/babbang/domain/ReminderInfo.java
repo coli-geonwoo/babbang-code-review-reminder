@@ -28,4 +28,8 @@ public class ReminderInfo {
 
     @Column(name = "review_hour")
     private long reviewHour;
+
+    public ReminderInfo(long approveCount, long githubRepoId, long reviewHour) {
+        this(null, approveCount, githubRepoId, reviewHour);
+    }
 }
