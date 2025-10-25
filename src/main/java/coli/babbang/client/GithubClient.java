@@ -5,6 +5,7 @@ import coli.babbang.dto.request.GithubWebhookRequest;
 import coli.babbang.dto.response.GithubPullRequestReviewResponse;
 import coli.babbang.dto.response.GithubRepoInfoResponse;
 import coli.babbang.dto.response.GithubReviewResponse;
+import coli.babbang.dto.response.WebhookCreateResponse;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -45,10 +46,12 @@ public class GithubClient {
     }
 
     //웹훅 심기
-    public void registerWebhook(GithubRepoUrl repoUrl, String webhookUrl, String token) {
-        restClient.post()
+    public WebhookCreateResponse registerWebhook(GithubRepoUrl repoUrl, String webhookUrl, String token) {
+        return restClient.post()
                 .uri("/repos/{owner}/{repo}/hooks", repoUrl.getOwner(), repoUrl.getRepoName())
                 .header(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + token)
-                .body(GithubWebhookRequest.ofPullRequestEvent(webhookUrl));
+                .body(GithubWebhookRequest.ofPullRequestEvent(webhookUrl))
+                .retrieve()
+                .body(WebhookCreateResponse.class);
     }
 }

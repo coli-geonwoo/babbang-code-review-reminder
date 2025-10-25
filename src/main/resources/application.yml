@@ -19,9 +19,13 @@ spring:
   flyway:
     enabled: false
     baseline-on-migrate: true
-discord:
-  token: testToken
-  channel-id: testChannelId
 
 github:
-  token: test
+  token: testToken
+
+discord:
+  token: testToken
+
+webhook:
+  url: "https://smee.io/p1sGJ9Aaz2xZd5"
+

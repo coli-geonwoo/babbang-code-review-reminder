@@ -10,13 +10,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class DiscordProperties {
 
     private final String token;
-    private final String channelId;
 
-    public DiscordProperties(String token, String channelId) {
+    public DiscordProperties(String token) {
         validate(token);
-        validate(channelId);
         this.token = token;
-        this.channelId = channelId;
     }
 
     private void validate(String element) {

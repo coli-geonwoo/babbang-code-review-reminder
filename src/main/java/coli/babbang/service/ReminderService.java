@@ -38,6 +38,10 @@ public class ReminderService {
 
     @Value("${github.token}")
     private String masterToken;
+
+    @Value("${webhook.url}")
+    private String webhookUrl;
+
     private final GithubClient githubClient;
     private final GithubRepoRepository githubRepoRepository;
     private final ReviewerRepository reviewerRepository;
@@ -68,7 +72,7 @@ public class ReminderService {
         DiscordProperty discordProperty = new DiscordProperty(savedRepo.getId(), request.channelId());
         discordPropertyRepository.save(discordProperty);
 
-        githubClient.registerWebhook(githubRepoUrl, "웹훅 Url", masterToken);
+        githubClient.registerWebhook(githubRepoUrl, webhookUrl, masterToken);
     }
 
     public void scheduleReminder(GithubPullRequest pullRequest) {
