@@ -19,11 +19,13 @@ import coli.babbang.repository.GithubRepoRepository;
 import coli.babbang.repository.PullRequestRepository;
 import coli.babbang.repository.ReminderRepository;
 import coli.babbang.repository.ReviewerRepository;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +43,7 @@ public class ReminderService {
     private final PullRequestRepository pullRequestRepository;
     private final RemindMessageResolver remindMessageResolver;
     private final DiscordNotifier discordNotifier;
+    private final TaskScheduler taskScheduler;
 
     @Transactional
     public void create(ReminderCreateRequest request) {
@@ -67,6 +70,13 @@ public class ReminderService {
         githubClient.registerWebhook(githubRepoUrl, "웹훅 Url", masterToken);
     }
 
+    public void scheduleReminder(GithubPullRequest pullRequest) {
+        ReminderInfo reminderInfo = reminderRepository.getByRepositoryId(pullRequest.getRepoId());
+        long afterHour = reminderInfo.getReviewHour();
+        Instant runAt = Instant.now().plusSeconds(afterHour * 3600);
+        taskScheduler.schedule(() -> remindPullRequest(pullRequest.getId()), runAt);
+    }
+
     @Transactional
     public void remindPullRequest(long pullRequestId) {
         //풀리퀘 가져오기 -> 머지되었는지 확인, 머지안되었으면 리뷰정보 가져오기 -> 머지 안한 사람을 담아 리뷰 확인
@@ -76,14 +86,14 @@ public class ReminderService {
                 .orElseThrow(() -> new BabbangException(ErrorCode.GITHUB_REPOSITORY_NOT_FOUND));
         ReminderInfo reminderInfo = reminderRepository.getByRepositoryId(repo.getId());
 
-        if(githubPullRequest.isMerged()) {
+        if (githubPullRequest.isMerged()) {
             return;
         }
 
         GithubPullRequestReviewResponse pullRequestInfo = githubClient.getPullRequestInfo(repo.getGithubRepoUrl(),
                 githubPullRequest.getExternalId(), masterToken);
 
-        if(reminderInfo.getApproveCount() <= pullRequestInfo.approveCount()) {
+        if (reminderInfo.getApproveCount() <= pullRequestInfo.approveCount()) {
             githubPullRequest.merge();
             return;
         }

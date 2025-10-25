@@ -6,6 +6,7 @@ import coli.babbang.domain.ReviewStatus;
 import coli.babbang.dto.request.GithubWebhookEventRequest;
 import coli.babbang.repository.GithubRepoRepository;
 import coli.babbang.repository.PullRequestRepository;
+import coli.babbang.repository.ReminderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GithubPullRequestService {
 
+    private final ReminderService reminderService;
     private final PullRequestRepository pullRequestRepository;
     private final GithubRepoRepository githubRepoRepository;
 
@@ -26,7 +28,7 @@ public class GithubPullRequestService {
             return;
         }
 
-        //열리는 이벤트 -> PR 저장
+        //열리는 이벤트 -> PR 저장 -> 리마인더 예약
         if(request.isOpened()) {
             GithubRepo githubRepo = githubRepoRepository.getByExternalId(request.getRepositoryId());
             GithubPullRequest openedPullRequest = new GithubPullRequest(
@@ -35,7 +37,8 @@ public class GithubPullRequestService {
                     request.getOpenUser(),
                     ReviewStatus.PENDING
             );
-            pullRequestRepository.save(openedPullRequest);
+            GithubPullRequest pullRequest = pullRequestRepository.save(openedPullRequest);
+            reminderService.scheduleReminder(pullRequest);
         }
     }
 }
