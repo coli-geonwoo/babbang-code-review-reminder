@@ -67,6 +67,7 @@ public class ReminderService {
         githubClient.registerWebhook(githubRepoUrl, "웹훅 Url", masterToken);
     }
 
+    @Transactional
     public void remindPullRequest(long pullRequestId) {
         //풀리퀘 가져오기 -> 머지되었는지 확인, 머지안되었으면 리뷰정보 가져오기 -> 머지 안한 사람을 담아 리뷰 확인
         GithubPullRequest githubPullRequest = pullRequestRepository.findById(pullRequestId)
@@ -89,13 +90,13 @@ public class ReminderService {
         Set<String> alreadyReviewedReviewer = new HashSet<>();
         alreadyReviewedReviewer.add(githubPullRequest.getOpenUser());
         alreadyReviewedReviewer.addAll(pullRequestInfo.approveTeamMateNames());
-
-        List<Reviewer> notReviewedReviwer = reviewerRepository.findAllByRepoId(repo.getId())
+        githubPullRequest.reviewing();
+        List<Reviewer> notReviewedReviewers = reviewerRepository.findAllByRepoId(repo.getId())
                 .stream()
                 .filter(reviewer -> !alreadyReviewedReviewer.contains(reviewer.getName()))
                 .toList();
 
-        String message = remindMessageResolver.resolve(notReviewedReviwer);
+        String message = remindMessageResolver.resolve(notReviewedReviewers);
 
         DiscordProperty discordProperty = discordPropertyRepository.findByRepoId(repo.getId())
                 .orElseThrow(() -> new BabbangException(ErrorCode.DISCORD_PROPERTY_NOT_FOUND));

@@ -45,6 +45,10 @@ public class GithubPullRequest {
         this.status = ReviewStatus.DONE;
     }
 
+    public void reviewing() {
+        this.status = ReviewStatus.WAITING;
+    }
+
     public boolean isMerged() {
         return this.status == ReviewStatus.DONE;
     }
