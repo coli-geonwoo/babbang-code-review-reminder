@@ -10,6 +10,7 @@ import coli.babbang.domain.github.GithubRepo;
 import coli.babbang.domain.github.GithubRepoUrl;
 import coli.babbang.domain.reminder.RemindMessageResolver;
 import coli.babbang.domain.reminder.ReminderInfo;
+import coli.babbang.domain.reminder.ReminderType;
 import coli.babbang.domain.github.Reviewer;
 import coli.babbang.dto.request.ReminderCreateRequest;
 import coli.babbang.dto.response.GithubPullRequestReviewResponse;
@@ -79,7 +80,7 @@ public class ReminderService {
         ReminderInfo reminderInfo = reminderRepository.getByRepositoryId(pullRequest.getRepoId());
         long afterHour = reminderInfo.getReviewHour();
         Instant runAt = Instant.now().plusSeconds(afterHour * 60); //TODO 시간으로 고치기
-        taskScheduler.schedule(() -> remindPullRequest(pullRequest.getId()), runAt);
+        taskScheduler.schedule(() -> remindPullRequest(pullRequest.getId(), ReminderType.REMINDER), runAt);
     }
 
     @Scheduled(cron = "0 0 8 * * *", zone = "Asia/Seoul")
@@ -87,13 +88,13 @@ public class ReminderService {
         List<GithubPullRequest> waitingPullRequests = pullRequestRepository.findAllByStatus(ReviewStatus.WAITING);
 
         for (GithubPullRequest pullRequest : waitingPullRequests) {
-            this.remindPullRequest(pullRequest.getId());
+            this.remindPullRequest(pullRequest.getId(), ReminderType.MORNING);
         }
     }
 
 
     @Transactional
-    public void remindPullRequest(long pullRequestId) {
+    public void remindPullRequest(long pullRequestId, ReminderType reminderType) {
         //풀리퀘 가져오기 -> 머지되었는지 확인, 머지안되었으면 리뷰정보 가져오기 -> 머지 안한 사람을 담아 리뷰 확인
         GithubPullRequest githubPullRequest = pullRequestRepository.getByAppId(pullRequestId);
         GithubRepo repo = githubRepoRepository.getByAppId(githubPullRequest.getRepoId());
@@ -117,12 +118,17 @@ public class ReminderService {
         githubPullRequest.reviewing();
         Set<String> alreadyReviewedReviewer = findDoneReviwewers(pullRequestInfo, githubPullRequest);
         List<Reviewer> notReviewedReviewers = reviewerRepository.findStupidReviewers(alreadyReviewedReviewer, repo.getId());
-        sendMessageToRepo(notReviewedReviewers, repo.getId());
+        sendMessageToRepo(notReviewedReviewers, repo, githubPullRequest, reminderType);
     }
 
-    private void sendMessageToRepo(List<Reviewer> notReviewedReviewers, long repoId) {
-        String message = remindMessageResolver.resolve(notReviewedReviewers);
-        DiscordProperty discordProperty = discordPropertyRepository.findByRepoId(repoId)
+    private void sendMessageToRepo(
+            List<Reviewer> notReviewedReviewers,
+            GithubRepo repo,
+            GithubPullRequest pullRequest,
+            ReminderType reminderType
+    ) {
+        String message = remindMessageResolver.resolve(notReviewedReviewers, reminderType, repo, pullRequest);
+        DiscordProperty discordProperty = discordPropertyRepository.findByRepoId(repo.getId())
                 .orElseThrow(() -> new BabbangException(ErrorCode.DISCORD_PROPERTY_NOT_FOUND));
 
         discordNotifier.sendMessage(message, discordProperty.getChannelId());
