@@ -21,7 +21,7 @@ spring:
     baseline-on-migrate: true
 
 github:
-  token: testToken
+  token:
 
 webhook:
   url: "https://smee.io/p1sGJ9Aaz2xZd5"

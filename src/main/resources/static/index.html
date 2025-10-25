@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>바빵 (Babbang) - 코드 리뷰 리마인더</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FFE4B5 0%, #FFDAB9 50%, #FFA07A 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FF8C42 0%, #FFA500 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '🍞';
+            position: absolute;
+            font-size: 100px;
+            opacity: 0.1;
+            top: -20px;
+            right: -20px;
+            transform: rotate(-15deg);
+        }
+
+        .header::after {
+            content: '🥖';
+            position: absolute;
+            font-size: 80px;
+            opacity: 0.1;
+            bottom: -15px;
+            left: -15px;
+            transform: rotate(25deg);
+        }
+
+        .logo {
+            font-size: 60px;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.1em;
+        }
+
+        .form-container {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .label-icon {
+            margin-right: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #FFE4B5;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: #FFFAF0;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #FFA500;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.1);
+        }
+
+        .reviewers-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .reviewers-input input {
+            flex: 1;
+        }
+
+        .add-reviewer-btn {
+            padding: 12px 20px;
+            background: #FFD700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .add-reviewer-btn:hover {
+            background: #FFC700;
+            transform: translateY(-2px);
+        }
+
+        .reviewer-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .reviewer-tag {
+            background: linear-gradient(135deg, #FFE4B5, #FFDAB9);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .remove-reviewer {
+            background: #FF6347;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .remove-reviewer:hover {
+            background: #FF4500;
+            transform: rotate(90deg);
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #FF8C42 0%, #FFA500 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 140, 66, 0.3);
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 140, 66, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #F0FFF0;
+            border-radius: 15px;
+            border-left: 5px solid #32CD32;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .result.error {
+            background: #FFE4E1;
+            border-left: 5px solid #DC143C;
+        }
+
+        .result h3 {
+            color: #228B22;
+            margin-bottom: 10px;
+        }
+
+        .result.error h3 {
+            color: #DC143C;
+        }
+
+        .result pre {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 0.9em;
+            border: 1px solid #ddd;
+        }
+
+        .error-message {
+            color: #DC143C;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .form-group.error input {
+            border-color: #DC143C;
+            background: #FFF5F5;
+        }
+
+        .loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .submit-btn.loading::after {
+            content: ' 🍞...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ' 🍞.'; }
+            40% { content: ' 🍞..'; }
+            60%, 100% { content: ' 🍞...'; }
+        }
+
+        .notification {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            font-size: 1.1em;
+            font-weight: 600;
+            z-index: 1000;
+            transition: top 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.show {
+            top: 30px;
+        }
+
+        .notification-icon {
+            font-size: 1.5em;
+            animation: bounce 0.6s ease infinite;
+        }
+
+        .breadcrumb {
+            position: absolute;
+            font-size: 30px;
+            opacity: 0;
+            animation: float 3s ease-in-out;
+        }
+
+        @keyframes float {
+            0% {
+                opacity: 0;
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="notification" id="notification">
+    <span class="notification-icon">🍞</span>
+    <span id="notificationText">정상적으로 설정되었습니다!</span>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div class="logo">🍞</div>
+        <h1>바빵 (Babbang)</h1>
+        <p class="subtitle">코드 리뷰 리마인더 서비스</p>
+    </div>
+
+    <div class="form-container">
+        <form id="reviewForm">
+            <div class="form-group">
+                <label><span class="label-icon">🔗</span>GitHub Repository URL</label>
+                <input type="text" id="githubRepoUrl" placeholder="https://github.com/username/repo" required>
+                <div class="error-message" id="error-githubRepoUrl">GitHub Repository URL을 입력해주세요.</div>
+            </div>
+
+            <div class="form-group">
+                <label><span class="label-icon">✅</span>Approve 필요 인원 수</label>
+                <input type="number" id="approveCount" value="1" min="1" required>
+                <div class="error-message" id="error-approveCount">Approve 필요 인원 수를 입력해주세요.</div>
+            </div>
+
+            <div class="form-group">
+                <label><span class="label-icon">⏰</span>리뷰 기한</label>
+                <div class="time-inputs">
+                    <div>
+                        <label style="font-weight: normal; font-size: 0.9em;">일 (Day)</label>
+                        <input type="number" id="reviewDay" value="0" min="0">
+                    </div>
+                    <div>
+                        <label style="font-weight: normal; font-size: 0.9em;">시간 (Hour)</label>
+                        <input type="number" id="reviewHour" value="1" min="0">
+                    </div>
+                </div>
+                <div class="error-message" id="error-reviewTime">리뷰 기한을 입력해주세요 (일과 시간 중 하나 이상).</div>
+            </div>
+
+            <div class="form-group">
+                <label><span class="label-icon">👥</span>리뷰어 (Reviewers)</label>
+                <div class="reviewers-input">
+                    <input type="text" id="reviewerInput" placeholder="github-username">
+                    <button type="button" class="add-reviewer-btn" onclick="addReviewer()">추가</button>
+                </div>
+                <div class="reviewer-list" id="reviewerList"></div>
+                <div class="error-message" id="error-reviewers">최소 1명 이상의 리뷰어를 추가해주세요.</div>
+            </div>
+
+            <div class="form-group">
+                <label><span class="label-icon">💬</span>Discord Channel ID</label>
+                <input type="text" id="channelId" placeholder="1234567890123456789" required>
+                <div class="error-message" id="error-channelId">Discord Channel ID를 입력해주세요.</div>
+            </div>
+
+            <div class="form-group">
+                <label><span class="label-icon">🤖</span>Discord Bot Token</label>
+                <input type="text" id="discordBotToken" placeholder="Your Discord Bot Token" required>
+                <div class="error-message" id="error-discordBotToken">Discord Bot Token을 입력해주세요.</div>
+            </div>
+
+            <button type="submit" class="submit-btn">🍞 바빵 시작하기!</button>
+        </form>
+
+        <div class="result" id="result">
+            <h3>🎉 설정이 완료되었습니다!</h3>
+            <pre id="jsonOutput"></pre>
+        </div>
+    </div>
+</div>
+
+<script>
+    let reviewers = [];
+
+    function showNotification(message, isSuccess = true) {
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const icon = notification.querySelector('.notification-icon');
+
+        notificationText.textContent = message;
+        icon.textContent = isSuccess ? '🍞' : '❌';
+
+        if (isSuccess) {
+            notification.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+        } else {
+            notification.style.background = 'linear-gradient(135deg, #f44336, #d32f2f)';
+        }
+
+        notification.classList.add('show');
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+
+    function addReviewer() {
+        const input = document.getElementById('reviewerInput');
+        const reviewer = input.value.trim();
+
+        if (reviewer && !reviewers.includes(reviewer)) {
+            reviewers.push(reviewer);
+            updateReviewerList();
+            input.value = '';
+            createBreadcrumb();
+            clearError('reviewers');
+        }
+    }
+
+    function removeReviewer(reviewer) {
+        reviewers = reviewers.filter(r => r !== reviewer);
+        updateReviewerList();
+    }
+
+    function updateReviewerList() {
+        const list = document.getElementById('reviewerList');
+        list.innerHTML = reviewers.map(reviewer => `
+                <div class="reviewer-tag">
+                    <span>${reviewer}</span>
+                    <button class="remove-reviewer" onclick="removeReviewer('${reviewer}')">×</button>
+                </div>
+            `).join('');
+    }
+
+    function createBreadcrumb() {
+        const breadcrumbs = ['🥐', '🥖', '🍞', '🥯', '🥨'];
+        const breadcrumb = document.createElement('div');
+        breadcrumb.className = 'breadcrumb';
+        breadcrumb.textContent = breadcrumbs[Math.floor(Math.random() * breadcrumbs.length)];
+        breadcrumb.style.left = Math.random() * window.innerWidth + 'px';
+        breadcrumb.style.top = window.innerHeight + 'px';
+        document.body.appendChild(breadcrumb);
+
+        setTimeout(() => breadcrumb.remove(), 3000);
+    }
+
+    function showError(fieldId) {
+        const errorMsg = document.getElementById(`error-${fieldId}`);
+        const formGroup = errorMsg.closest('.form-group');
+        errorMsg.classList.add('show');
+        formGroup.classList.add('error');
+    }
+
+    function clearError(fieldId) {
+        const errorMsg = document.getElementById(`error-${fieldId}`);
+        const formGroup = errorMsg.closest('.form-group');
+        errorMsg.classList.remove('show');
+        formGroup.classList.remove('error');
+    }
+
+    function clearAllErrors() {
+        document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+        document.querySelectorAll('.form-group').forEach(el => el.classList.remove('error'));
+    }
+
+    function validateForm() {
+        clearAllErrors();
+        let isValid = true;
+
+        // GitHub Repo URL
+        const githubRepoUrl = document.getElementById('githubRepoUrl').value.trim();
+        if (!githubRepoUrl) {
+            showError('githubRepoUrl');
+            isValid = false;
+        }
+
+        // Approve Count
+        const approveCount = document.getElementById('approveCount').value;
+        if (!approveCount || approveCount < 1) {
+            showError('approveCount');
+            isValid = false;
+        }
+
+        // Review Time
+        const reviewDay = parseInt(document.getElementById('reviewDay').value) || 0;
+        const reviewHour = parseInt(document.getElementById('reviewHour').value) || 0;
+        if (reviewDay === 0 && reviewHour === 0) {
+            showError('reviewTime');
+            isValid = false;
+        }
+
+        // Reviewers
+        if (reviewers.length === 0) {
+            showError('reviewers');
+            isValid = false;
+        }
+
+        // Channel ID
+        const channelId = document.getElementById('channelId').value.trim();
+        if (!channelId) {
+            showError('channelId');
+            isValid = false;
+        }
+
+        // Discord Bot Token
+        const discordBotToken = document.getElementById('discordBotToken').value.trim();
+        if (!discordBotToken) {
+            showError('discordBotToken');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    document.getElementById('reviewerInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addReviewer();
+        }
+    });
+
+    // Input 변경 시 에러 메시지 제거
+    ['githubRepoUrl', 'approveCount', 'reviewDay', 'reviewHour', 'channelId', 'discordBotToken'].forEach(id => {
+        document.getElementById(id).addEventListener('input', function() {
+            clearError(id);
+            if (id === 'reviewDay' || id === 'reviewHour') {
+                clearError('reviewTime');
+            }
+        });
+    });
+
+    document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
+        const submitBtn = document.querySelector('.submit-btn');
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+
+        const formData = {
+            githubRepoUrl: document.getElementById('githubRepoUrl').value.trim(),
+            approveCount: parseInt(document.getElementById('approveCount').value),
+            reviewDay: parseInt(document.getElementById('reviewDay').value) || 0,
+            reviewHour: parseInt(document.getElementById('reviewHour').value) || 0,
+            reviewers: reviewers,
+            channelId: parseInt(document.getElementById('channelId').value.trim()),
+            discordBotToken: document.getElementById('discordBotToken').value.trim()
+        };
+
+        try {
+            const response = await fetch('/api/reminder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.classList.remove('error');
+
+            if (response.ok) {
+                let result;
+                const contentType = response.headers.get("content-type");
+
+                // 응답 본문이 있는지 확인
+                const text = await response.text();
+
+                if (text && contentType && contentType.includes("application/json")) {
+                    try {
+                        result = JSON.parse(text);
+                    } catch (e) {
+                        result = { message: "설정이 완료되었습니다.", response: text };
+                    }
+                } else if (text) {
+                    result = { message: "설정이 완료되었습니다.", response: text };
+                } else {
+                    result = { message: "설정이 완료되었습니다." };
+                }
+
+                document.getElementById('jsonOutput').textContent = JSON.stringify(result, null, 2);
+                resultDiv.querySelector('h3').textContent = '🎉 설정이 완료되었습니다!';
+                resultDiv.classList.add('show');
+
+                // 성공 알림 표시
+                showNotification('정상적으로 설정되었습니다! 🎉', true);
+
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => createBreadcrumb(), i * 200);
+                }
+            } else {
+                const error = await response.text();
+                document.getElementById('jsonOutput').textContent = error || '알 수 없는 오류가 발생했습니다.';
+                resultDiv.querySelector('h3').textContent = '❌ 오류가 발생했습니다';
+                resultDiv.classList.add('show', 'error');
+
+                // 실패 알림 표시
+                showNotification('설정에 실패했습니다. 다시 시도해주세요.', false);
+            }
+        } catch (error) {
+            const resultDiv = document.getElementById('result');
+            document.getElementById('jsonOutput').textContent = '서버 연결에 실패했습니다: ' + error.message;
+            resultDiv.querySelector('h3').textContent = '❌ 오류가 발생했습니다';
+            resultDiv.classList.add('show', 'error');
+
+            // 에러 알림 표시
+            showNotification('서버 연결에 실패했습니다.', false);
+        } finally {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+        }
+    });
+
+    // 초기 리뷰어 추가 (예시)
+    reviewers = ['coli-geonwoo'];
+    updateReviewerList();
+</script>
+</body>
+</html>
