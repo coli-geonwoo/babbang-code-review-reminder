@@ -32,6 +32,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +53,7 @@ public class ReminderService {
     private final RemindMessageResolver remindMessageResolver;
     private final DiscordNotifier discordNotifier;
     private final TaskScheduler taskScheduler;
+    private final TransactionTemplate transactionTemplate;
 
     @Transactional
     public void create(ReminderCreateRequest request) {
@@ -88,37 +90,38 @@ public class ReminderService {
         List<GithubPullRequest> waitingPullRequests = pullRequestRepository.findAllByStatus(ReviewStatus.WAITING);
 
         for (GithubPullRequest pullRequest : waitingPullRequests) {
-            this.remindPullRequest(pullRequest.getId(), ReminderType.MORNING);
+            remindPullRequest(pullRequest.getId(), ReminderType.MORNING);
         }
     }
 
-
-    @Transactional
     public void remindPullRequest(long pullRequestId, ReminderType reminderType) {
-        //풀리퀘 가져오기 -> 머지되었는지 확인, 머지안되었으면 리뷰정보 가져오기 -> 머지 안한 사람을 담아 리뷰 확인
-        GithubPullRequest githubPullRequest = pullRequestRepository.getByAppId(pullRequestId);
-        GithubRepo repo = githubRepoRepository.getByAppId(githubPullRequest.getRepoId());
-        ReminderInfo reminderInfo = reminderRepository.getByRepositoryId(repo.getId());
+        transactionTemplate.executeWithoutResult(transactionStatus-> {
+            //풀리퀘 가져오기 -> 머지되었는지 확인, 머지안되었으면 리뷰정보 가져오기 -> 머지 안한 사람을 담아 리뷰 확인
+            GithubPullRequest githubPullRequest = pullRequestRepository.getByAppId(pullRequestId);
+            GithubRepo repo = githubRepoRepository.getByAppId(githubPullRequest.getRepoId());
+            ReminderInfo reminderInfo = reminderRepository.getByRepositoryId(repo.getId());
 
-        if (githubPullRequest.isMerged()) {
-            return;
-        }
+            if (githubPullRequest.isMerged()) {
+                return;
+            }
 
-        GithubPullRequestReviewResponse pullRequestInfo = githubClient.getPullRequestInfo(
-                repo.getGithubRepoUrl(),
-                githubPullRequest.getNumber(),
-                masterToken
-        );
+            GithubPullRequestReviewResponse pullRequestInfo = githubClient.getPullRequestInfo(
+                    repo.getGithubRepoUrl(),
+                    githubPullRequest.getNumber(),
+                    masterToken
+            );
 
-        if (reminderInfo.getApproveCount() <= pullRequestInfo.approveCount()) {
-            githubPullRequest.merge();
-            return;
-        }
+            if (reminderInfo.getApproveCount() <= pullRequestInfo.approveCount()) {
+                githubPullRequest.merge();
+                return;
+            }
 
-        githubPullRequest.reviewing();
-        Set<String> alreadyReviewedReviewer = findDoneReviwewers(pullRequestInfo, githubPullRequest);
-        List<Reviewer> notReviewedReviewers = reviewerRepository.findStupidReviewers(alreadyReviewedReviewer, repo.getId());
-        sendMessageToRepo(notReviewedReviewers, repo, githubPullRequest, reminderType);
+            githubPullRequest.reviewing();
+            Set<String> alreadyReviewedReviewer = findDoneReviwewers(pullRequestInfo, githubPullRequest);
+            List<Reviewer> notReviewedReviewers = reviewerRepository.findStupidReviewers(alreadyReviewedReviewer,
+                    repo.getId());
+            sendMessageToRepo(notReviewedReviewers, repo, githubPullRequest, reminderType);
+        });
     }
 
     private void sendMessageToRepo(
