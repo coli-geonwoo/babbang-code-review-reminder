@@ -1,7 +1,6 @@
 package coli.babbang.repository;
 
-import coli.babbang.domain.GithubPullRequest;
-import coli.babbang.domain.GithubRepo;
+import coli.babbang.domain.github.GithubRepo;
 import coli.babbang.exception.custom.BabbangException;
 import coli.babbang.exception.errorcode.ErrorCode;
 import java.util.Optional;

@@ -1,12 +1,11 @@
 package coli.babbang.service;
 
-import coli.babbang.domain.GithubPullRequest;
-import coli.babbang.domain.GithubRepo;
-import coli.babbang.domain.ReviewStatus;
+import coli.babbang.domain.github.GithubPullRequest;
+import coli.babbang.domain.github.GithubRepo;
+import coli.babbang.domain.github.ReviewStatus;
 import coli.babbang.dto.request.GithubWebhookEventRequest;
 import coli.babbang.repository.GithubRepoRepository;
 import coli.babbang.repository.PullRequestRepository;
-import coli.babbang.repository.ReminderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

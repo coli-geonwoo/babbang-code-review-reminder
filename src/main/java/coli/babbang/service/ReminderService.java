@@ -1,14 +1,14 @@
 package coli.babbang.service;
 
 import coli.babbang.client.GithubClient;
-import coli.babbang.domain.DiscordNotifier;
-import coli.babbang.domain.DiscordProperty;
-import coli.babbang.domain.GithubPullRequest;
-import coli.babbang.domain.GithubRepo;
-import coli.babbang.domain.GithubRepoUrl;
-import coli.babbang.domain.RemindMessageResolver;
-import coli.babbang.domain.ReminderInfo;
-import coli.babbang.domain.Reviewer;
+import coli.babbang.domain.notifier.DiscordNotifier;
+import coli.babbang.domain.notifier.DiscordProperty;
+import coli.babbang.domain.github.GithubPullRequest;
+import coli.babbang.domain.github.GithubRepo;
+import coli.babbang.domain.github.GithubRepoUrl;
+import coli.babbang.domain.reminder.RemindMessageResolver;
+import coli.babbang.domain.reminder.ReminderInfo;
+import coli.babbang.domain.github.Reviewer;
 import coli.babbang.dto.request.ReminderCreateRequest;
 import coli.babbang.dto.response.GithubPullRequestReviewResponse;
 import coli.babbang.dto.response.GithubRepoInfoResponse;

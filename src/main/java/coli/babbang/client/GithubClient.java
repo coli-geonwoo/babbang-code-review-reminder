@@ -1,10 +1,9 @@
 package coli.babbang.client;
 
-import coli.babbang.domain.GithubRepoUrl;
+import coli.babbang.domain.github.GithubRepoUrl;
 import coli.babbang.dto.request.GithubWebhookRequest;
 import coli.babbang.dto.response.GithubPullRequestReviewResponse;
 import coli.babbang.dto.response.GithubRepoInfoResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;

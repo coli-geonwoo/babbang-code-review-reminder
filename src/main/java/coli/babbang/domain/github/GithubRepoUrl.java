@@ -1,4 +1,4 @@
-package coli.babbang.domain;
+package coli.babbang.domain.github;
 
 import java.net.MalformedURLException;
 import java.net.URL;

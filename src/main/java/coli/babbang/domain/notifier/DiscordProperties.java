@@ -1,4 +1,4 @@
-package coli.babbang.domain;
+package coli.babbang.domain.notifier;
 
 import coli.babbang.exception.custom.BabbangException;
 import coli.babbang.exception.errorcode.ErrorCode;

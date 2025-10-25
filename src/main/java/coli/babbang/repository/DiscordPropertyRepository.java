@@ -1,6 +1,6 @@
 package coli.babbang.repository;
 
-import coli.babbang.domain.DiscordProperty;
+import coli.babbang.domain.notifier.DiscordProperty;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

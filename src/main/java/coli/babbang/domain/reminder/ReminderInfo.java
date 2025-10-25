@@ -1,11 +1,10 @@
-package coli.babbang.domain;
+package coli.babbang.domain.reminder;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,19 +14,22 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Reviewer {
+public class ReminderInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "repo_id")
-    private long repoId;
+    @Column(name = "approve_count")
+    private long approveCount;
 
-    @NotBlank
-    private String name;
+    @Column(unique = true, name = "github_repo_id")
+    private long githubRepoId;
 
-    public Reviewer(long repoId, String name) {
-        this(null, repoId, name);
+    @Column(name = "review_hour")
+    private long reviewHour;
+
+    public ReminderInfo(long approveCount, long githubRepoId, long reviewHour) {
+        this(null, approveCount, githubRepoId, reviewHour);
     }
 }

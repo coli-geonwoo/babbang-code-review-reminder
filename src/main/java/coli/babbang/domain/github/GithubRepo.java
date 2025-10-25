@@ -1,9 +1,11 @@
-package coli.babbang.domain;
+package coli.babbang.domain.github;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,17 +15,23 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class DiscordProperty {
+public class GithubRepo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private long repoId;
+    @Column(unique = true, name = "extrenal_id")
+    private long externalId;
 
-    private long channelId;
+    @NotBlank
+    private String url;
 
-    public DiscordProperty(long repoId, long channelId) {
-        this(null, repoId, channelId);
+    public GithubRepo(long externalId, String url) {
+        this(null, externalId, url);
+    }
+
+    public GithubRepoUrl getGithubRepoUrl() {
+        return new GithubRepoUrl(url);
     }
 }

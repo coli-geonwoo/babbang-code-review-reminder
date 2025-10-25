@@ -1,7 +1,7 @@
 package coli.babbang.config;
 
-import coli.babbang.domain.DiscordNotifier;
-import coli.babbang.domain.DiscordProperties;
+import coli.babbang.domain.notifier.DiscordNotifier;
+import coli.babbang.domain.notifier.DiscordProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

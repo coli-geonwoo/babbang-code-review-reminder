@@ -1,4 +1,4 @@
-package coli.babbang.domain;
+package coli.babbang.domain.github;
 
 public enum ReviewStatus {
 

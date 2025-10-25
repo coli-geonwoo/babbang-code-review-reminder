@@ -1,4 +1,4 @@
-package coli.babbang.domain;
+package coli.babbang.domain.github;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,23 +15,19 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class GithubRepo {
+public class Reviewer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, name = "extrenal_id")
-    private long externalId;
+    @Column(name = "repo_id")
+    private long repoId;
 
     @NotBlank
-    private String url;
+    private String name;
 
-    public GithubRepo(long externalId, String url) {
-        this(null, externalId, url);
-    }
-
-    public GithubRepoUrl getGithubRepoUrl() {
-        return new GithubRepoUrl(url);
+    public Reviewer(long repoId, String name) {
+        this(null, repoId, name);
     }
 }

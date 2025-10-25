@@ -1,6 +1,6 @@
 package coli.babbang.repository;
 
-import coli.babbang.domain.ReminderInfo;
+import coli.babbang.domain.reminder.ReminderInfo;
 import coli.babbang.exception.custom.BabbangException;
 import coli.babbang.exception.errorcode.ErrorCode;
 import java.util.Optional;

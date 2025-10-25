@@ -1,6 +1,5 @@
-package coli.babbang.domain;
+package coli.babbang.domain.notifier;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,22 +13,17 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ReminderInfo {
+public class DiscordProperty {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "approve_count")
-    private long approveCount;
+    private long repoId;
 
-    @Column(unique = true, name = "github_repo_id")
-    private long githubRepoId;
+    private long channelId;
 
-    @Column(name = "review_hour")
-    private long reviewHour;
-
-    public ReminderInfo(long approveCount, long githubRepoId, long reviewHour) {
-        this(null, approveCount, githubRepoId, reviewHour);
+    public DiscordProperty(long repoId, long channelId) {
+        this(null, repoId, channelId);
     }
 }

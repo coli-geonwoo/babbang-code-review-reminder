@@ -1,4 +1,4 @@
-package coli.babbang.domain;
+package coli.babbang.domain.github;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

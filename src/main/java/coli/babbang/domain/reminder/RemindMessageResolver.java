@@ -1,5 +1,6 @@
-package coli.babbang.domain;
+package coli.babbang.domain.reminder;
 
+import coli.babbang.domain.github.Reviewer;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
