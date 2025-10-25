@@ -1,6 +1,7 @@
 package coli.babbang.service;
 
 import coli.babbang.client.GithubClient;
+import coli.babbang.domain.github.Reviewers;
 import coli.babbang.domain.notifier.DiscordNotifier;
 import coli.babbang.domain.notifier.DiscordProperty;
 import coli.babbang.domain.github.GithubPullRequest;
@@ -54,10 +55,8 @@ public class ReminderService {
         GithubRepo savedRepo = githubRepoRepository.save(githubRepo);
 
         //리뷰어 저장
-        List<Reviewer> reviewers = request.reviewers().stream()
-                .map(name -> new Reviewer(savedRepo.getId(), name))
-                .toList();
-        reviewerRepository.saveAll(reviewers);
+        Reviewers reviewers = new Reviewers(request.reviewers(), savedRepo.getId());
+        reviewerRepository.saveAll(reviewers.getValues());
 
         //리마인더 저장
         ReminderInfo reminderInfo = new ReminderInfo(request.approveCount(), savedRepo.getId(), request.reviewToHour());
