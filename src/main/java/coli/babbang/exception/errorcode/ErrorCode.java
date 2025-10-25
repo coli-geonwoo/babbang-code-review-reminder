@@ -6,6 +6,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    GITHUB_REPOSITORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "레포지토리를 찾을 수 없습니다"),
+    PULL_REQUEST_NOT_FOUND(HttpStatus.BAD_REQUEST, "풀리퀘스트를 찾을 수 없습니다"),
+
     FIELD_ERROR(HttpStatus.BAD_REQUEST, "입력이 잘못되었습니다."),
     URL_PARAMETER_ERROR(HttpStatus.BAD_REQUEST, "입력이 잘못되었습니다."),
     METHOD_ARGUMENT_TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "입력한 값의 타입이 잘못되었습니다."),

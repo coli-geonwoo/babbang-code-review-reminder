@@ -5,11 +5,11 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public abstract class BabbangException extends RuntimeException {
+public class BabbangException extends RuntimeException {
 
     private final HttpStatus httpStatus;
 
-    protected BabbangException(ErrorCode errorCode) {
+    public BabbangException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.httpStatus = errorCode.getStatus();
     }

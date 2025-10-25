@@ -30,11 +30,18 @@ public class GithubPullRequest {
     @Column(name = "repo_id")
     private long repoId;
 
+    @NotBlank
+    private String openUser;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private ReviewStatus status;
 
-    public GithubPullRequest(long externalId, long repoId, ReviewStatus status) {
-        this(null, externalId, repoId, status);
+    public GithubPullRequest(long externalId, long repoId, String openUser, ReviewStatus status) {
+        this(null, externalId, repoId, openUser, status);
+    }
+
+    public void merge() {
+        this.status = ReviewStatus.DONE;
     }
 }
