@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReminderService {
 
+    @Value("${github.token}")
+    private String masterToken;
     private final GithubClient githubClient;
     private final GithubRepoRepository githubRepoRepository;
     private final ReviewerRepository reviewerRepository;
@@ -38,8 +41,6 @@ public class ReminderService {
     private final PullRequestRepository pullRequestRepository;
     private final RemindMessageResolver remindMessageResolver;
     private final DiscordNotifier discordNotifier;
-
-    private String masterToken;
 
     @Transactional
     public void create(ReminderCreateRequest request) {
