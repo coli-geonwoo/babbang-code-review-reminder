@@ -32,6 +32,7 @@ public class GithubPullRequestService {
             GithubRepo githubRepo = githubRepoRepository.getByExternalId(request.getRepositoryId());
             GithubPullRequest openedPullRequest = new GithubPullRequest(
                     request.getExternalId(),
+                    request.number(),
                     githubRepo.getId(),
                     request.getOpenUser(),
                     ReviewStatus.PENDING

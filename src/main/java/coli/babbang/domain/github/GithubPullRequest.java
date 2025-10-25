@@ -27,6 +27,8 @@ public class GithubPullRequest {
     @Column(name = "external_id")
     private long externalId;
 
+    private long number;
+
     @Column(name = "repo_id")
     private long repoId;
 
@@ -37,8 +39,8 @@ public class GithubPullRequest {
     @Enumerated(EnumType.STRING)
     private ReviewStatus status;
 
-    public GithubPullRequest(long externalId, long repoId, String openUser, ReviewStatus status) {
-        this(null, externalId, repoId, openUser, status);
+    public GithubPullRequest(long externalId, long number, long repoId, String openUser, ReviewStatus status) {
+        this(null, externalId, number, repoId, openUser, status);
     }
 
     public void merge() {

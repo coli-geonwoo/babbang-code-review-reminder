@@ -74,7 +74,7 @@ public class ReminderService {
     public void scheduleReminder(GithubPullRequest pullRequest) {
         ReminderInfo reminderInfo = reminderRepository.getByRepositoryId(pullRequest.getRepoId());
         long afterHour = reminderInfo.getReviewHour();
-        Instant runAt = Instant.now().plusSeconds(afterHour * 3600);
+        Instant runAt = Instant.now().plusSeconds(afterHour * 60); //TODO 시간으로 고치기
         taskScheduler.schedule(() -> remindPullRequest(pullRequest.getId()), runAt);
     }
 
@@ -101,7 +101,7 @@ public class ReminderService {
 
         GithubPullRequestReviewResponse pullRequestInfo = githubClient.getPullRequestInfo(
                 repo.getGithubRepoUrl(),
-                githubPullRequest.getExternalId(),
+                githubPullRequest.getNumber(),
                 masterToken
         );
 

@@ -4,6 +4,9 @@ import coli.babbang.domain.github.GithubRepoUrl;
 import coli.babbang.dto.request.GithubWebhookRequest;
 import coli.babbang.dto.response.GithubPullRequestReviewResponse;
 import coli.babbang.dto.response.GithubRepoInfoResponse;
+import coli.babbang.dto.response.GithubReviewResponse;
+import java.util.List;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -31,13 +34,14 @@ public class GithubClient {
     }
 
     //풀리퀘스트 정보 얻기
-    public GithubPullRequestReviewResponse getPullRequestInfo(GithubRepoUrl repoUrl, long githubPullRequestId, String token) {
-        restClient.get()
-                .uri("/repos/{owner}/{repo}/pulls/{pull_number}/reviews", repoUrl.getOwner(), repoUrl.getRepoName(), githubPullRequestId)
+    public GithubPullRequestReviewResponse getPullRequestInfo(GithubRepoUrl repoUrl, long pullRequestNumber, String token) {
+        List<GithubReviewResponse> reviewResponses = restClient.get()
+                .uri("/repos/{owner}/{repo}/pulls/{pull_number}/reviews", repoUrl.getOwner(), repoUrl.getRepoName(),
+                        pullRequestNumber)
                 .header(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + token)
                 .retrieve()
-                .body(GithubRepoInfoResponse.class);
-        return null;
+                .body(new ParameterizedTypeReference<>() {});
+        return GithubPullRequestReviewResponse.from(reviewResponses);
     }
 
     //웹훅 심기
