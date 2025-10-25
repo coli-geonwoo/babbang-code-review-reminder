@@ -14,4 +14,9 @@ public interface GithubRepoRepository extends JpaRepository<GithubRepo, Long> {
         return findByExternalId(externalId)
                 .orElseThrow(() -> new BabbangException(ErrorCode.GITHUB_REPOSITORY_NOT_FOUND));
     }
+
+    default GithubRepo getByAppId(long appId) {
+        return findById(appId)
+                .orElseThrow(() -> new BabbangException(ErrorCode.GITHUB_REPOSITORY_NOT_FOUND));
+    }
 }

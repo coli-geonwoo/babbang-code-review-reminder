@@ -1,6 +1,7 @@
 package coli.babbang.service;
 
 import coli.babbang.client.GithubClient;
+import coli.babbang.domain.github.ReviewStatus;
 import coli.babbang.domain.github.Reviewers;
 import coli.babbang.domain.notifier.DiscordNotifier;
 import coli.babbang.domain.notifier.DiscordProperty;
@@ -27,6 +28,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,40 +78,56 @@ public class ReminderService {
         taskScheduler.schedule(() -> remindPullRequest(pullRequest.getId()), runAt);
     }
 
+    @Scheduled(cron = "0 0 8 * * *", zone = "Asia/Seoul")
+    public void sendMorningReminder() {
+        List<GithubPullRequest> waitingPullRequests = pullRequestRepository.findAllByStatus(ReviewStatus.WAITING);
+
+        for (GithubPullRequest pullRequest : waitingPullRequests) {
+            this.remindPullRequest(pullRequest.getId());
+        }
+    }
+
+
     @Transactional
     public void remindPullRequest(long pullRequestId) {
         //풀리퀘 가져오기 -> 머지되었는지 확인, 머지안되었으면 리뷰정보 가져오기 -> 머지 안한 사람을 담아 리뷰 확인
-        GithubPullRequest githubPullRequest = pullRequestRepository.findById(pullRequestId)
-                .orElseThrow(() -> new BabbangException(ErrorCode.PULL_REQUEST_NOT_FOUND));
-        GithubRepo repo = githubRepoRepository.findById(githubPullRequest.getRepoId())
-                .orElseThrow(() -> new BabbangException(ErrorCode.GITHUB_REPOSITORY_NOT_FOUND));
+        GithubPullRequest githubPullRequest = pullRequestRepository.getByAppId(pullRequestId);
+        GithubRepo repo = githubRepoRepository.getByAppId(githubPullRequest.getRepoId());
         ReminderInfo reminderInfo = reminderRepository.getByRepositoryId(repo.getId());
 
         if (githubPullRequest.isMerged()) {
             return;
         }
 
-        GithubPullRequestReviewResponse pullRequestInfo = githubClient.getPullRequestInfo(repo.getGithubRepoUrl(),
-                githubPullRequest.getExternalId(), masterToken);
+        GithubPullRequestReviewResponse pullRequestInfo = githubClient.getPullRequestInfo(
+                repo.getGithubRepoUrl(),
+                githubPullRequest.getExternalId(),
+                masterToken
+        );
 
         if (reminderInfo.getApproveCount() <= pullRequestInfo.approveCount()) {
             githubPullRequest.merge();
             return;
         }
-        Set<String> alreadyReviewedReviewer = new HashSet<>();
-        alreadyReviewedReviewer.add(githubPullRequest.getOpenUser());
-        alreadyReviewedReviewer.addAll(pullRequestInfo.approveTeamMateNames());
+
         githubPullRequest.reviewing();
-        List<Reviewer> notReviewedReviewers = reviewerRepository.findAllByRepoId(repo.getId())
-                .stream()
-                .filter(reviewer -> !alreadyReviewedReviewer.contains(reviewer.getName()))
-                .toList();
+        Set<String> alreadyReviewedReviewer = findDoneReviwewers(pullRequestInfo, githubPullRequest);
+        List<Reviewer> notReviewedReviewers = reviewerRepository.findStupidReviewers(alreadyReviewedReviewer, repo.getId());
+        sendMessageToRepo(notReviewedReviewers, repo.getId());
+    }
 
+    private void sendMessageToRepo(List<Reviewer> notReviewedReviewers, long repoId) {
         String message = remindMessageResolver.resolve(notReviewedReviewers);
-
-        DiscordProperty discordProperty = discordPropertyRepository.findByRepoId(repo.getId())
+        DiscordProperty discordProperty = discordPropertyRepository.findByRepoId(repoId)
                 .orElseThrow(() -> new BabbangException(ErrorCode.DISCORD_PROPERTY_NOT_FOUND));
 
         discordNotifier.sendMessage(message, discordProperty.getChannelId());
+    }
+
+    private Set<String> findDoneReviwewers(GithubPullRequestReviewResponse reviewInfo, GithubPullRequest pullRequest) {
+        Set<String> alreadyReviewedReviewer = new HashSet<>();
+        alreadyReviewedReviewer.add(pullRequest.getOpenUser());
+        alreadyReviewedReviewer.addAll(reviewInfo.approveTeamMateNames());
+        return alreadyReviewedReviewer;
     }
 }
