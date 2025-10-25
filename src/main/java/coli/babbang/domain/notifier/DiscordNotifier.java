@@ -3,18 +3,22 @@ package coli.babbang.domain.notifier;
 
 import coli.babbang.exception.custom.BabbangException;
 import coli.babbang.exception.errorcode.ErrorCode;
+import java.util.HashMap;
+import java.util.Map;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DiscordNotifier {
 
-    private final DiscordProperties properties;
-    private final JDA jda;
+    private final Map<String, JDA> jdaMap = new HashMap<>();
 
-    public DiscordNotifier(DiscordProperties discordProperties) {
-        this.properties = discordProperties;
-        this.jda = initializeJda(properties.getToken());
+    public void sendMessage(String message, DiscordProperty discordProperty) {
+        JDA jda = jdaMap.getOrDefault(message.toLowerCase(), initializeJda(discordProperty.getDiscordBotToken()));
+        TextChannel channel = jda.getTextChannelById(discordProperty.getChannelId());
+        channel.sendMessage(message).queue();
     }
 
     private JDA initializeJda(String token) {
@@ -24,10 +28,5 @@ public class DiscordNotifier {
             Thread.currentThread().interrupt();
             throw new BabbangException(ErrorCode.DISCORD_PROPERTIES_EMPTY);
         }
-    }
-
-    public void sendMessage(String message, long channelId) {
-        TextChannel channel = jda.getTextChannelById(channelId);
-        channel.sendMessage(message).queue();
     }
 }

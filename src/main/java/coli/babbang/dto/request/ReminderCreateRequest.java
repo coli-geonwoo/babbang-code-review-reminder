@@ -8,7 +8,8 @@ public record ReminderCreateRequest(
         long reviewDay,
         long reviewHour,
         List<String> reviewers,
-        long channelId
+        long channelId,
+        String discordBotToken
 ) {
 
     public long reviewToHour() {

@@ -21,9 +21,9 @@ public class RemindMessageResolver {
         String body = getBody(notReviewedReviewers);
         String url = resolvePullRequestUrl(repo, githubPullRequest);
 
-        StringJoiner joiner = new StringJoiner(System.lineSeparator());
-        joiner.add(header);
+        StringJoiner joiner = new StringJoiner(System.lineSeparator().repeat(2));
         joiner.add(body);
+        joiner.add(header);
         joiner.add(url);
         return joiner.toString();
     }

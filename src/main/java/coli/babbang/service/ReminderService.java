@@ -72,7 +72,7 @@ public class ReminderService {
         reminderRepository.save(reminderInfo);
 
         //디스코드 속성 생성
-        DiscordProperty discordProperty = new DiscordProperty(savedRepo.getId(), request.channelId());
+        DiscordProperty discordProperty = new DiscordProperty(savedRepo.getId(), request.channelId(), request.discordBotToken());
         discordPropertyRepository.save(discordProperty);
 
         githubClient.registerWebhook(githubRepoUrl, webhookUrl, masterToken);
@@ -134,7 +134,7 @@ public class ReminderService {
         DiscordProperty discordProperty = discordPropertyRepository.findByRepoId(repo.getId())
                 .orElseThrow(() -> new BabbangException(ErrorCode.DISCORD_PROPERTY_NOT_FOUND));
 
-        discordNotifier.sendMessage(message, discordProperty.getChannelId());
+        discordNotifier.sendMessage(message, discordProperty);
     }
 
     private Set<String> findDoneReviwewers(GithubPullRequestReviewResponse reviewInfo, GithubPullRequest pullRequest) {

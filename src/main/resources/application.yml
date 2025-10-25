@@ -23,9 +23,6 @@ spring:
 github:
   token: testToken
 
-discord:
-  token: testToken
-
 webhook:
   url: "https://smee.io/p1sGJ9Aaz2xZd5"
 

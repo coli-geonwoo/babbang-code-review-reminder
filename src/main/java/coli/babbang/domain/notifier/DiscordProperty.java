@@ -23,7 +23,9 @@ public class DiscordProperty {
 
     private long channelId;
 
-    public DiscordProperty(long repoId, long channelId) {
-        this(null, repoId, channelId);
+    private String discordBotToken;
+
+    public DiscordProperty(long repoId, long channelId, String discordBotToken) {
+        this(null, repoId, channelId, discordBotToken);
     }
 }
