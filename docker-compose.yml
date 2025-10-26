@@ -6,12 +6,14 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_HOST: localhost
       MYSQL_ROOT_PASSWORD: ${PROD_MYSQL_PASSWORD}
       MYSQL_DATABASE: babbang
-      TZ: Asia/seoul
+      MYSQL_USER: babbang_user  # 추가
+      MYSQL_PASSWORD: ${PROD_MYSQL_PASSWORD}  # 추가
+      TZ: Asia/Seoul
     volumes:
       - babbang-db-vol:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # 추가
     platform: linux/arm64
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
@@ -19,23 +21,24 @@ services:
       timeout: 30s
       retries: 5
     networks:
-      - default
+      - shared_network
 
   web:
     image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPOSITORY}:${TAG}
     container_name: babbang-app
     ports:
-      - "8080"
+      - "8080:8080"
     platform: linux/arm64
     depends_on:
       db:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: dev
+      MYSQL_PASSWORD: ${PROD_MYSQL_PASSWORD}
       GITHUB_TOKEN: ${GITHUB_TOKEN}
     networks:
       - shared_network
-      - default
+
 volumes:
   babbang-db-vol:
 
