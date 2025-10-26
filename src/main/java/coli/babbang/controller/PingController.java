@@ -16,7 +16,7 @@ public class PingController {
     private String webhookUrl;
 
 
-    @GetMapping("/")
+    @GetMapping("/ping")
     public String pong() {
         log.info(masterToken + "github Token");
         log.info(webhookUrl + "webhook");
