@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  DOCKERHUB_REPOSITORY: coli1021
+  DOCKERHUB_REPOSITORY: cdtest
 
 jobs:
   build-and-push:
