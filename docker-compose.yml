@@ -1,0 +1,44 @@
+services:
+  db:
+    image: mysql:latest
+    container_name: babbang-db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_HOST: localhost
+      MYSQL_ROOT_PASSWORD: ${PROD_MYSQL_PASSWORD}
+      MYSQL_DATABASE: babbang
+      TZ: Asia/seoul
+    volumes:
+      - babbang-db-vol:/var/lib/mysql
+    platform: linux/arm64
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+    networks:
+      - default
+
+  web:
+    image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPOSITORY}:${TAG}
+    container_name: babbang-app
+    ports:
+      - "8080"
+    platform: linux/arm64
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+    networks:
+      - shared_network
+      - default
+volumes:
+  babbang-db-vol:
+
+networks:
+  shared_network:
+    external: true
