@@ -51,7 +51,6 @@ jobs:
           docker tag ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:prod-latest ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:prod-previous || true
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:prod-previous || true
 
-
       - name: Docker Image Build And Push
         run: |
           docker buildx build \
@@ -61,58 +60,49 @@ jobs:
             . \
             --push
 
-#      - name: Docker Image Build And Push
-##        run: docker build --platform linux/arm64 -t ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:${{ github.sha }}-prod -f Dockerfile . --push
-#        run: docker buildx build \
-#            --platform linux/amd64,linux/arm64 \
-#            -t ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:${{ github.sha }}-prod \
-#            -f Dockerfile \
-#            . \
-#            --push
-#
-#  pull-and-deploy:
-#    needs: build-and-push
-#    runs-on: prod
-#    steps:
-#      - name: Login to Docker Hub
-#        uses: docker/login-action@v3
-#        with:
-#          username: ${{ secrets.DOCKERHUB_USERNAME }}
-#          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-#
-#      - name: Clean Up Legacy Image
-#        run: |
-#          docker compose down || true
-#          docker rmi $(docker images -q) -f || true
-#
-#      - name: Docker Compose up
-#        run: |
-#          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-#          export DOCKERHUB_REPOSITORY=$DOCKERHUB_REPOSITORY
-#          export PROD_MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}
-#          export GITHUB_TOKEN=${{ secrets.GIT_SECRET_TOKEN }}
-#          export TAG=${{ github.sha }}-prod
-#          docker compose up -d
-#
-#      - name: Rollback if Health Check fails
-#        if: failure()
-#        run: |
-#          docker compose down || true
-#          docker rmi $(docker images -q) -f || true
-#          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:prod-previous
-#
-#          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-#          export DOCKERHUB_REPOSITORY=$DOCKERHUB_REPOSITORY
-#          export PROD_MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}
-#          export TAG=prod-previous
-#          docker compose up -d
-#
-#      - name: Tag successful deployment as latest
-#        if: success()
-#        run: |
-#          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:${{ github.sha }}-prod ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:prod-latest
-#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:prod-latest
-#
-#      - name: Check Docker Process
-#        if: always()
-#        run: docker ps
+  pull-and-deploy:
+    needs: build-and-push
+    runs-on: prod
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Clean Up Legacy Image
+        run: |
+          docker compose down || true
+          docker rmi $(docker images -q) -f || true
+
+      - name: Docker Compose up
+        run: |
+          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          export DOCKERHUB_REPOSITORY=$DOCKERHUB_REPOSITORY
+          export PROD_MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}
+          export GITHUB_TOKEN=${{ secrets.GIT_SECRET_TOKEN }}
+          export TAG=${{ github.sha }}-prod
+          docker compose up -d
+
+      - name: Rollback if Health Check fails
+        if: failure()
+        run: |
+          docker compose down || true
+          docker rmi $(docker images -q) -f || true
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:prod-previous
+
+          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          export DOCKERHUB_REPOSITORY=$DOCKERHUB_REPOSITORY
+          export PROD_MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}
+          export TAG=prod-previous
+          docker compose up -d
+
+      - name: Tag successful deployment as latest
+        if: success()
+        run: |
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:${{ github.sha }}-prod ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:prod-latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/$DOCKERHUB_REPOSITORY:prod-latest
+
+      - name: Check Docker Process
+        if: always()
+        run: docker ps
