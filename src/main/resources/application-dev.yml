@@ -36,5 +36,5 @@ github:
   token: ${GITHUB_TOKEN}
 
 webhook:
-  url: "https://babbang.site/api/pull-requests/webhook""
+  url: "https://babbang.site/api/pull-requests/webhook"
 
