@@ -595,7 +595,7 @@
             reviewDay: parseInt(document.getElementById('reviewDay').value) || 0,
             reviewHour: parseInt(document.getElementById('reviewHour').value) || 0,
             reviewers: reviewers,
-            channelId: parseInt(document.getElementById('channelId').value.trim()),
+            channelId: document.getElementById('channelId').value.trim(),
             discordBotToken: document.getElementById('discordBotToken').value.trim()
         };
 

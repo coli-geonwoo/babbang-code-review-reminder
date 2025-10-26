@@ -13,7 +13,6 @@ services:
       TZ: Asia/Seoul
     volumes:
       - babbang-db-vol:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # 추가
     platform: linux/arm64
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
