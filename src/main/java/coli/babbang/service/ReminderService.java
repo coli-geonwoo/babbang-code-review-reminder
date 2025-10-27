@@ -81,11 +81,11 @@ public class ReminderService {
     public void scheduleReminder(GithubPullRequest pullRequest) {
         ReminderInfo reminderInfo = reminderRepository.getByRepositoryId(pullRequest.getRepoId());
         long afterHour = reminderInfo.getReviewHour();
-        Instant runAt = Instant.now().plusSeconds(afterHour * 60); //TODO 시간으로 고치기
+        Instant runAt = Instant.now().plusSeconds(afterHour * 3600);
         taskScheduler.schedule(() -> remindPullRequest(pullRequest.getId(), ReminderType.REMINDER), runAt);
     }
 
-    @Scheduled(cron = "0 7 18 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 8 * * *", zone = "Asia/Seoul")
     public void sendMorningReminder() {
         List<GithubPullRequest> waitingPullRequests = pullRequestRepository.findAllByStatus(ReviewStatus.WAITING);
 
