@@ -85,7 +85,7 @@ public class ReminderService {
         taskScheduler.schedule(() -> remindPullRequest(pullRequest.getId(), ReminderType.REMINDER), runAt);
     }
 
-    @Scheduled(cron = "0 55 17 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 7 18 * * *", zone = "Asia/Seoul")
     public void sendMorningReminder() {
         List<GithubPullRequest> waitingPullRequests = pullRequestRepository.findAllByStatus(ReviewStatus.WAITING);
 
