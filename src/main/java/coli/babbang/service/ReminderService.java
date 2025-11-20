@@ -117,10 +117,15 @@ public class ReminderService {
             }
 
             githubPullRequest.reviewing();
-            Set<String> alreadyReviewedReviewer = findDoneReviwewers(pullRequestInfo, githubPullRequest);
-            List<Reviewer> notReviewedReviewers = reviewerRepository.findStupidReviewers(alreadyReviewedReviewer,
-                    repo.getId());
-            sendMessageToRepo(notReviewedReviewers, repo, githubPullRequest, reminderType);
+            Set<String> alreadyReviewedReviewer = findDoneReviewers(pullRequestInfo, githubPullRequest);
+            List<Reviewer> notReviewedReviewers = reviewerRepository.findStupidReviewers(
+                    alreadyReviewedReviewer,
+                    repo.getId()
+            );
+
+            if(!notReviewedReviewers.isEmpty()) {
+                sendMessageToRepo(notReviewedReviewers, repo, githubPullRequest, reminderType);
+            }
         });
     }
 
@@ -137,10 +142,10 @@ public class ReminderService {
         discordNotifier.sendMessage(message, discordProperty);
     }
 
-    private Set<String> findDoneReviwewers(GithubPullRequestReviewResponse reviewInfo, GithubPullRequest pullRequest) {
+    private Set<String> findDoneReviewers(GithubPullRequestReviewResponse reviewInfo, GithubPullRequest pullRequest) {
         Set<String> alreadyReviewedReviewer = new HashSet<>();
         alreadyReviewedReviewer.add(pullRequest.getOpenUser());
-        alreadyReviewedReviewer.addAll(reviewInfo.approveTeamMateNames());
+        alreadyReviewedReviewer.addAll(reviewInfo.reviewTeamMateNames());
         return alreadyReviewedReviewer;
     }
 }
